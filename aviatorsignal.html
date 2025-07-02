@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SL DARK HACKER</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+      padding-top: 20px;
+    }
+
+    .box {
+      padding: 10px 20px;
+      border: 2px solid #FF0000;
+      border-radius: 10px;
+      background: #000;
+      box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+      text-align: center;
+    }
+
+    .box h1 {
+      font-size: 20px;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, red, orange, yellow, green, cyan, blue, violet);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: textGlow 2s infinite linear;
+    }
+
+    @keyframes textGlow {
+      0% {
+        background-position: 0% 50%;
+      }
+      100% {
+        background-position: 100% 50%;
+      }
+    }
+
+    .signal-box {
+      padding: 20px;
+      border: 2px solid #00FF00;
+      border-radius: 15px;
+      background: #1e1e1e;
+      margin-top: 30px;
+      box-shadow: 0 0 30px rgba(0, 255, 0, 0.4);
+      font-size: 16px;
+      width: 90%;
+      max-width: 200px;
+      max-height: 290px;
+      overflow-y: auto;
+      text-align: center; /* Optional, in case heading needs center */
+    }
+
+    .signal-box h2 {
+      color: #00FF00;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .signal-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      text-align: center; /* ✅ Center signal text */
+    }
+
+    .signal-item {
+      font-size: 18px;
+      margin: 5px 0;
+      color: #FF0000;
+      transition: all 0.3s ease;
+    }
+
+    .signal-item:hover {
+      color: #00ffcc;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>SL DARK HACKER AVIATOR SIGNAL BOT AI</h1>
+  </div>
+
+  <div class="signal-box">
+    <h2>AVIATOR SIGNAL</h2>
+    <ul class="signal-list" id="signalList"></ul>
+  </div>
+
+  <script>
+    const signalList = document.getElementById('signalList');
+    let signals = [];
+    let lastGeneratedHour = null;
+
+    function getHourKey(date = new Date()) {
+      return `${date.getHours().toString().padStart(2, '0')}`;
+    }
+
+    function saveSignals(hour, signalArray) {
+      localStorage.setItem(`signals_${hour}`, JSON.stringify(signalArray));
+    }
+
+    function loadSignals(hour) {
+      const stored = localStorage.getItem(`signals_${hour}`);
+      return stored ? JSON.parse(stored) : null;
+    }
+
+    function getRandomMinutes(count = 10) {
+      const minutes = new Set();
+      while (minutes.size < count) {
+        minutes.add(Math.floor(Math.random() * 60));
+      }
+      return [...minutes].sort((a, b) => a - b);
+    }
+
+    function generateSignalsForHour(hour) {
+      const mins = getRandomMinutes();
+      return mins.map(min => `${hour}:${min.toString().padStart(2, '0')}`);
+    }
+
+    function renderSignals(signalArray) {
+      signalList.innerHTML = '';
+      signalArray.forEach(signal => {
+        const li = document.createElement('li');
+        li.classList.add('signal-item');
+        li.textContent = signal;
+        signalList.appendChild(li);
+      });
+    }
+
+    function updateSignals() {
+      const now = new Date();
+      const hour = getHourKey(now);
+
+      if (hour !== lastGeneratedHour) {
+        lastGeneratedHour = hour;
+        const loaded = loadSignals(hour);
+        if (loaded) {
+          signals = loaded;
+        } else {
+          signals = generateSignalsForHour(hour);
+          saveSignals(hour, signals);
+        }
+
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('signals_') && !key.endsWith(hour)) {
+            localStorage.removeItem(key);
+          }
+        });
+      }
+
+      renderSignals(signals);
+    }
+
+    setInterval(updateSignals, 60000);
+    updateSignals();
+  </script>
+</body>
+</html>
